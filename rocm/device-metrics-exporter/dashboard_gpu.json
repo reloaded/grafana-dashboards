@@ -2432,7 +2432,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "GPU",
+  "title": "GPU - Detailed per-GPU metrics",
   "uid": "ae0aj8euc43r4b",
   "version": 1,
   "weekStart": ""
