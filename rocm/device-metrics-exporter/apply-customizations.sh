@@ -21,3 +21,5 @@ sed -E \
   "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
 
 echo "[✓] Updated $file"
+
+rm "$bak"
