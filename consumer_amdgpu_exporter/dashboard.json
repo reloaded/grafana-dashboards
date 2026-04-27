@@ -1,0 +1,278 @@
+{
+  "title": "AMD GPU (consumer / RDNA)",
+  "uid": "amdgpu-consumer",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "tags": ["amdgpu", "gpu", "rocm"],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0
+      },
+      {
+        "name": "host",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": "label_values(amdgpu_nodes_total, instance)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "gpu",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": "label_values(amdgpu_info{instance=~\"$host\"}, gpu)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Identity",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "GPU info",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 6, "w": 18, "x": 0, "y": 1 },
+      "options": { "showHeader": true },
+      "transformations": [
+        { "id": "labelsToFields", "options": { "mode": "columns" } },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "job": true } } }
+      ],
+      "targets": [
+        {
+          "expr": "amdgpu_info{instance=~\"$host\", gpu=~\"$gpu\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Performance level",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 1 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^level$/" }, "graphMode": "none" },
+      "transformations": [{ "id": "labelsToFields", "options": { "mode": "columns" } }],
+      "targets": [
+        { "expr": "amdgpu_performance_level_info{instance=~\"$host\", gpu=~\"$gpu\"}", "format": "table", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "GPUs in scope",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 4 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "graphMode": "none" },
+      "targets": [
+        { "expr": "sum(amdgpu_nodes_total{instance=~\"$host\"})", "refId": "A" }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Activity & temperature",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "GPU / memory busy",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
+      "targets": [
+        { "expr": "amdgpu_gpu_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gfx", "refId": "A" },
+        { "expr": "amdgpu_memory_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} mem", "refId": "B" }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Temperatures",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "celsius", "min": 0 }, "overrides": [] },
+      "targets": [
+        { "expr": "amdgpu_temperature_celsius{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} {{sensor}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Power & fans",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Power draw vs cap",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "fieldConfig": { "defaults": { "unit": "watt", "min": 0 }, "overrides": [
+        { "matcher": { "id": "byRegexp", "options": ".*cap.*" }, "properties": [
+          { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }
+        ]}
+      ]},
+      "targets": [
+        { "expr": "amdgpu_power_usage_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} draw", "refId": "A" },
+        { "expr": "amdgpu_power_cap_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} cap", "refId": "B" },
+        { "expr": "amdgpu_power_cap_default_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} TDP default", "refId": "C" }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "Fan RPM / PWM%",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "fieldConfig": { "defaults": { "min": 0 }, "overrides": [
+        { "matcher": { "id": "byRegexp", "options": ".*pwm.*" }, "properties": [
+          { "id": "unit", "value": "percent" }, { "id": "custom.axisPlacement", "value": "right" }
+        ]},
+        { "matcher": { "id": "byRegexp", "options": ".*rpm.*" }, "properties": [
+          { "id": "unit", "value": "rotrpm" }
+        ]}
+      ]},
+      "targets": [
+        { "expr": "amdgpu_fan_speed_rpm{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} rpm", "refId": "A" },
+        { "expr": "amdgpu_fan_pwm_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} pwm%", "refId": "B" }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Clocks & voltage",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 }
+    },
+    {
+      "id": 31,
+      "type": "timeseries",
+      "title": "Active clocks (DPM)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 26 },
+      "fieldConfig": { "defaults": { "unit": "rotmhz", "min": 0 }, "overrides": [] },
+      "targets": [
+        { "expr": "amdgpu_clock_mhz{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} {{domain}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "timeseries",
+      "title": "Voltage rails",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 26 },
+      "fieldConfig": { "defaults": { "unit": "volt" }, "overrides": [] },
+      "targets": [
+        { "expr": "amdgpu_voltage_volts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} {{rail}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 40,
+      "type": "row",
+      "title": "Memory & PCIe",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 }
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "VRAM used / total",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 35 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "min": 0 }, "overrides": [] },
+      "targets": [
+        { "expr": "amdgpu_vram_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} used", "refId": "A" },
+        { "expr": "amdgpu_vram_total_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} total", "refId": "B" }
+      ]
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "GTT used",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 35 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "min": 0 } },
+      "targets": [
+        { "expr": "amdgpu_gtt_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gtt", "refId": "A" }
+      ]
+    },
+    {
+      "id": 43,
+      "type": "stat",
+      "title": "PCIe link",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 35 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "amdgpu_pcie_link_speed_gts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{gpu}} GT/s", "refId": "A" },
+        { "expr": "amdgpu_pcie_link_width{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{gpu}} lanes", "refId": "B" }
+      ]
+    },
+    {
+      "id": 44,
+      "type": "stat",
+      "title": "Visible VRAM (BAR)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 39 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "amdgpu_vram_visible_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{gpu}} used", "refId": "A" },
+        { "expr": "amdgpu_vram_visible_total_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{gpu}} total", "refId": "B" }
+      ]
+    },
+    {
+      "id": 50,
+      "type": "row",
+      "title": "Per-process",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 43 }
+    },
+    {
+      "id": 51,
+      "type": "table",
+      "title": "Top processes by VRAM",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 44 },
+      "options": { "showHeader": true },
+      "transformations": [
+        { "id": "labelsToFields", "options": { "mode": "columns" } },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true } } }
+      ],
+      "targets": [
+        { "expr": "topk(10, amdgpu_process_vram_bytes{instance=~\"$host\", gpu=~\"$gpu\"})", "format": "table", "instant": true, "refId": "A" }
+      ]
+    },
+    {
+      "id": 52,
+      "type": "timeseries",
+      "title": "Per-process engine busy (rate)",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 44 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 } },
+      "targets": [
+        { "expr": "rate(amdgpu_process_engine_busy_seconds_total{instance=~\"$host\", gpu=~\"$gpu\"}[1m])", "legendFormat": "{{instance}} {{gpu}} {{engine}} pid={{pid}} ({{comm}})", "refId": "A" }
+      ]
+    }
+  ]
+}
