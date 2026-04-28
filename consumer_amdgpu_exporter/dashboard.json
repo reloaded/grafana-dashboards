@@ -2,7 +2,7 @@
   "title": "AMD GPU (consumer / RDNA)",
   "uid": "amdgpu-consumer",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": true,
   "graphTooltip": 1,
   "refresh": "30s",
@@ -20,6 +20,8 @@
       {
         "name": "host",
         "type": "query",
+        "label": "Host",
+        "description": "Pick a Prometheus scrape target. The exporter publishes one target per AMD-GPU host (e.g. ai-01.home.compute.lan:9505). 'All' aggregates across every host with at least one consumer AMD GPU.",
         "datasource": { "type": "prometheus", "uid": "${datasource}" },
         "query": "label_values(amdgpu_nodes_total, instance)",
         "refresh": 2,
@@ -30,6 +32,8 @@
       {
         "name": "gpu",
         "type": "query",
+        "label": "GPU",
+        "description": "Pick which GPU(s) to display when a host has more than one. The value is the Linux DRM card identifier — card0 is the first AMD GPU the kernel discovered, card1 the second, etc. The same GPU keeps the same id across reboots as long as the PCI topology doesn't change.",
         "datasource": { "type": "prometheus", "uid": "${datasource}" },
         "query": "label_values(amdgpu_info{instance=~\"$host\"}, gpu)",
         "refresh": 2,
@@ -50,6 +54,7 @@
       "id": 2,
       "type": "table",
       "title": "GPU info",
+      "description": "Per-card identity. Sourced from the kernel's amdgpu sysfs nodes, plus optional fields from `amd-smi static --json` if the amd-smi backend is enabled in the exporter.\n\n**Columns**\n- `card` — the Linux DRM card id (`card0` = first AMD GPU on the host)\n- `pci_addr` — PCIe bus address of the card (`domain:bus:device.function`)\n- `model` — product name from the kernel (`product_name`); falls back to the raw PCI device id (e.g. `0x744c` for Navi 31) when the kernel doesn't expose a name\n- `vbios` — the video BIOS version string baked into the card firmware\n- `revision` — silicon revision (`0xc8` etc.)\n- `kernel` — Linux kernel version on the host\n- `uuid` — KFD UUID, only populated when the amd-smi backend is enabled\n- `market_name` — marketing name (e.g. `Radeon RX 7900 XTX`), amd-smi backend only\n- `vbios_date` — VBIOS build date, amd-smi backend only",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 6, "w": 18, "x": 0, "y": 1 },
       "options": { "showHeader": true },
@@ -58,18 +63,14 @@
         { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "job": true } } }
       ],
       "targets": [
-        {
-          "expr": "amdgpu_info{instance=~\"$host\", gpu=~\"$gpu\"}",
-          "format": "table",
-          "instant": true,
-          "refId": "A"
-        }
+        { "expr": "amdgpu_info{instance=~\"$host\", gpu=~\"$gpu\"}", "format": "table", "instant": true, "refId": "A" }
       ]
     },
     {
       "id": 3,
       "type": "stat",
       "title": "Performance level",
+      "description": "Current value of the kernel's `power_dpm_force_performance_level`. Controls how aggressively the GPU steps clocks under load.\n\n**Common values**\n- `auto` — kernel picks DPM steps based on activity (default; almost always what you want)\n- `low` — pin to the lowest DPM step (deep idle clocks)\n- `high` — pin to the highest DPM step (max performance)\n- `manual` — use whatever was last written to `pp_dpm_*` mask files\n- `profile_standard` / `_peak` / `_min_sclk` / `_min_mclk` — preset profiles\n\nFlip this with `echo <level> > /sys/class/drm/card0/device/power_dpm_force_performance_level` (root).",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 3, "w": 6, "x": 18, "y": 1 },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^level$/" }, "graphMode": "none" },
@@ -82,6 +83,7 @@
       "id": 4,
       "type": "stat",
       "title": "GPUs in scope",
+      "description": "Number of AMD GPUs being summarised by the host filter. Sum of `amdgpu_nodes_total` across every selected host.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 3, "w": 6, "x": 18, "y": 4 },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "graphMode": "none" },
@@ -99,23 +101,25 @@
       "id": 11,
       "type": "timeseries",
       "title": "GPU / memory busy",
+      "description": "How often the GPU's graphics engine and memory controller had work in flight, sampled by the kernel.\n\n**`gfx`** — graphics engine busy %, from `gpu_busy_percent`. 100 means the shader cores never had a free cycle in the sampling window. ROCm/HIP/OpenCL/Vulkan compute and rendering all show up here.\n\n**`mem`** — memory-controller busy %, from `mem_busy_percent`. 100 means VRAM read/write traffic was saturated. A workload can push gfx high and mem low (compute-bound) or vice versa (bandwidth-bound).\n\nBoth are 0–100 instantaneous; rate() / avg_over_time() in PromQL if you want smoothed.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
       "targets": [
-        { "expr": "amdgpu_gpu_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gfx", "refId": "A" },
-        { "expr": "amdgpu_memory_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} mem", "refId": "B" }
+        { "expr": "amdgpu_gpu_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gfx (graphics engine)", "refId": "A" },
+        { "expr": "amdgpu_memory_busy_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} mem (memory controller)", "refId": "B" }
       ]
     },
     {
       "id": 12,
       "type": "timeseries",
       "title": "Temperatures",
+      "description": "Per-sensor die temperatures from `hwmon/temp{N}_input`, scaled from milliCelsius.\n\n**Sensors on RDNA3 (and similar on RDNA / RDNA2)**\n- `edge` — die surface near the I/O ring; closest to ambient, lowest of the three\n- `junction` — hottest spot inside the die (a.k.a. `Tj`); this is what AMD's thermal throttling watches. Throttle threshold is around **110 °C** on RX 7900-series; sustained values >100 °C should prompt a fan-curve check\n- `mem` — GDDR6 memory die. GDDR6 max op-temp is 95 °C; sustained values >85 °C signal poor airflow over the back of the card\n\nIf the `mem` sensor reads close to `edge` at idle, the temp might be averaged from a different point than expected for the SKU.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "fieldConfig": { "defaults": { "unit": "celsius", "min": 0 }, "overrides": [] },
       "targets": [
-        { "expr": "amdgpu_temperature_celsius{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} {{sensor}}", "refId": "A" }
+        { "expr": "amdgpu_temperature_celsius{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} {{sensor}} (die hotspot)", "refId": "A" }
       ]
     },
     {
@@ -128,6 +132,7 @@
       "id": 21,
       "type": "timeseries",
       "title": "Power draw vs cap",
+      "description": "Average package power vs. the kernel's configured power limit.\n\n**`draw`** — current average package power, from `hwmon/power1_average`. Includes shader cores, memory controller, video engines, and on-die fabric. Values are the kernel's running average over a short window.\n\n**`cap`** — currently-enforced power limit from `hwmon/power1_cap`. Anything over this triggers DPM downclock. Defaults to `cap default` but can be lowered (or raised, on supported SKUs) via `echo <microwatts> > /sys/class/drm/card0/device/hwmon/hwmon*/power1_cap`.\n\n**`TDP default`** — board's stock Thermal Design Power, from `power1_cap_default`. Use this as the baseline reference; e.g. RX 7900 XTX = 355 W stock.\n\nDashed reference lines for cap / TDP make it easy to see headroom at a glance.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
       "fieldConfig": { "defaults": { "unit": "watt", "min": 0 }, "overrides": [
@@ -136,15 +141,16 @@
         ]}
       ]},
       "targets": [
-        { "expr": "amdgpu_power_usage_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} draw", "refId": "A" },
-        { "expr": "amdgpu_power_cap_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} cap", "refId": "B" },
-        { "expr": "amdgpu_power_cap_default_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} TDP default", "refId": "C" }
+        { "expr": "amdgpu_power_usage_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} draw (current)", "refId": "A" },
+        { "expr": "amdgpu_power_cap_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} cap (current power limit)", "refId": "B" },
+        { "expr": "amdgpu_power_cap_default_watts{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} TDP default (stock board limit)", "refId": "C" }
       ]
     },
     {
       "id": 22,
       "type": "timeseries",
       "title": "Fan RPM / PWM%",
+      "description": "Per-fan speed (RPM) and PWM duty cycle. RX 7900 XTX has three fans on the reference cooler (most AIB cards too).\n\n**`rpm`** — tachometer reading from `hwmon/fan{N}_input`. 0 RPM is normal at idle when zero-fan mode is active (the kernel parks fans below ~50 °C edge to keep the card silent).\n\n**`pwm%`** — fan PWM duty cycle (0–100), derived from `hwmon/pwm{N}` ÷ `pwm{N}_max`. **PWM** = Pulse Width Modulation, the fraction of each cycle the fan power rail is driven high; effectively how hard the kernel is pushing the fans.\n\nA jump in PWM% with no corresponding RPM rise is a stuck-fan signal worth investigating.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
       "fieldConfig": { "defaults": { "min": 0 }, "overrides": [
@@ -156,8 +162,8 @@
         ]}
       ]},
       "targets": [
-        { "expr": "amdgpu_fan_speed_rpm{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} rpm", "refId": "A" },
-        { "expr": "amdgpu_fan_pwm_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} pwm%", "refId": "B" }
+        { "expr": "amdgpu_fan_speed_rpm{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} rpm (tachometer)", "refId": "A" },
+        { "expr": "amdgpu_fan_pwm_percent{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} fan{{fan}} pwm% (drive duty cycle)", "refId": "B" }
       ]
     },
     {
@@ -170,6 +176,7 @@
       "id": 31,
       "type": "timeseries",
       "title": "Active clocks (DPM)",
+      "description": "Currently-active DPM step (frequency) for each on-die clock domain, from `pp_dpm_*`. **DPM** = Dynamic Power Management; the kernel hops between a small set of pre-defined clock/voltage steps based on activity.\n\n**Domains**\n- **`sclk`** — Shader / graphics engine clock. The big one. Idle ≈ 0–500 MHz, gaming/compute boost ≈ 2300–2900 MHz on RX 7900 XTX\n- **`mclk`** — Memory clock. RDNA3 GDDR6 boost ≈ 2487 MHz (effective 19.5 Gbps); idle drops to 96 MHz\n- **`fclk`** — Fabric clock. The on-die data fabric (Infinity Fabric) connecting shader engines, memory, and I/O. Roughly tracks mclk under load\n- **`socclk`** — SoC clock. On-die system-on-chip blocks (display, multimedia, etc.)\n- **`vclk`** / **`dclk`** — Video / Decode engine clocks (VCN). Drives encode (vclk) and decode (dclk) pipelines\n- **`pcie`** — PCIe link DPM step. Step 0 is Gen1 x4-style; the highest step is the card's max link speed × width\n\nWhen all clocks are at their lowest step the GPU is in deep idle. Sclk pinned at the top of its range while gfx busy stays low can mean a workload is bottlenecked outside the shader cores (memory, fabric).",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 16, "x": 0, "y": 26 },
       "fieldConfig": { "defaults": { "unit": "rotmhz", "min": 0 }, "overrides": [] },
@@ -181,6 +188,7 @@
       "id": 32,
       "type": "timeseries",
       "title": "Voltage rails",
+      "description": "Per-rail voltage readings from `hwmon/in{N}_input` (millivolts → volts).\n\n**Rails**\n- **`vddgfx`** — graphics rail. Powers the shader engines / GFX cores. Idle ~0.7 V on RDNA3, boost ~1.05 V\n- **`vddnb`** — northbridge / IO rail. Powers the on-die SoC blocks and memory controller. Generally stays close to a fixed value (~1.0–1.1 V on RDNA3)\n\nNote: AMD GPUs don't expose every internal rail through hwmon. Reading `0` here means the kernel didn't surface that rail for this SKU, not that it's actually 0 V.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 26 },
       "fieldConfig": { "defaults": { "unit": "volt" }, "overrides": [] },
@@ -198,29 +206,32 @@
       "id": 41,
       "type": "timeseries",
       "title": "VRAM used / total",
+      "description": "**VRAM** = Video RAM, the GPU's on-card memory (GDDR6 on RDNA3, e.g. 24 GiB on RX 7900 XTX). Sourced from `mem_info_vram_used` and `mem_info_vram_total`.\n\n`used` includes everything currently allocated by every DRM client on the card — your compute jobs, the kernel's own driver buffers, framebuffer for any attached display, etc. There's no per-process breakdown here; see the **Top processes by VRAM** panel for that.\n\nWhen `used` approaches `total`, new allocations either spill into GTT (system RAM accessed via PCIe — much slower) or fail outright with OOM, depending on the workload's allocation flags.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 35 },
       "fieldConfig": { "defaults": { "unit": "bytes", "min": 0 }, "overrides": [] },
       "targets": [
-        { "expr": "amdgpu_vram_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} used", "refId": "A" },
-        { "expr": "amdgpu_vram_total_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} total", "refId": "B" }
+        { "expr": "amdgpu_vram_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} used (current allocation)", "refId": "A" },
+        { "expr": "amdgpu_vram_total_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} total (board capacity)", "refId": "B" }
       ]
     },
     {
       "id": 42,
       "type": "timeseries",
       "title": "GTT used",
+      "description": "**GTT** = Graphics Translation Table. System RAM (host DRAM) that's been mapped into the GPU's address space and can be accessed over PCIe. Used as overflow when VRAM is full and as the path for buffers that need to be written by both CPU and GPU (e.g. command buffers, dynamic vertex data).\n\nGTT access is much slower than VRAM access (PCIe 4.0 x16 ≈ 32 GB/s vs. GDDR6 ≈ 800 GB/s on RX 7900 XTX), so high GTT usage during a compute workload is a sign the working set didn't fit in VRAM.\n\nGTT total is bounded by either the system's GART aperture or (on most modern systems) by the kernel's heuristic — typically half of system RAM.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 6, "x": 12, "y": 35 },
       "fieldConfig": { "defaults": { "unit": "bytes", "min": 0 } },
       "targets": [
-        { "expr": "amdgpu_gtt_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gtt", "refId": "A" }
+        { "expr": "amdgpu_gtt_used_bytes{instance=~\"$host\", gpu=~\"$gpu\"}", "legendFormat": "{{instance}} {{gpu}} gtt (system-RAM-backed GPU buffers)", "refId": "A" }
       ]
     },
     {
       "id": 43,
       "type": "stat",
       "title": "PCIe link",
+      "description": "Current PCIe link the card has trained to.\n\n**`GT/s`** = GigaTransfers per second per lane. Defines PCIe generation:\n- 2.5 GT/s → Gen 1\n- 5.0 GT/s → Gen 2\n- 8.0 GT/s → Gen 3\n- 16 GT/s → Gen 4 (RX 7900-series stock)\n- 32 GT/s → Gen 5 (RDNA4 / next gen)\n\n**`lanes`** — width of the link. x16 is standard for a discrete card in a primary PCIe slot. x8 or x4 means the slot is shared / chipset-attached / running at reduced width — verify the slot config if you expected x16.\n\n**Note on idle:** AMDGPU runtime PM lowers the link to a deep-idle state (often Gen 1 x4-equivalent) when nothing has the GPU open. The exporter holds a render-node fd to keep the card resumed, so this panel reflects the steady-state max-trained values.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 35 },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value_and_name" },
@@ -233,6 +244,7 @@
       "id": 44,
       "type": "stat",
       "title": "Visible VRAM (BAR)",
+      "description": "**BAR** = Base Address Register. The portion of VRAM that's mapped into the host's CPU address space, so the CPU can directly read and write it.\n\n- Without **Resizable BAR** (`ReBAR`) enabled, this is a small window (256 MiB on most systems). Anything bigger has to round-trip through the kernel's GPU command stream — adds latency.\n- With `ReBAR` enabled (UEFI setting + supported chipset), this expands to the full VRAM size (24 GiB on RX 7900 XTX). Many compute and gaming workloads benefit measurably.\n\nIf this panel reads 256 MiB and you have a modern board, check UEFI for `Above 4G Decoding` + `Re-Size BAR Support`.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 39 },
       "fieldConfig": { "defaults": { "unit": "bytes" } },
@@ -252,6 +264,7 @@
       "id": 51,
       "type": "table",
       "title": "Top processes by VRAM",
+      "description": "Top 10 host processes by VRAM allocation, from `/proc/<pid>/fdinfo/* drm-memory-vram`.\n\n**Empty when no GPU workload is running.** This panel only shows processes that currently have a DRM file descriptor open against this card (Ollama / llama.cpp / a ROCm container / radeontop / nvtop / etc.) and have allocated VRAM through it.\n\n**Columns**\n- `pid` — host PID (the exporter runs with hostPID=true to see the real PID, not a containerized one)\n- `comm` — first 64 bytes of `/proc/<pid>/comm` (the kernel's view of the program name)\n- `Value` — VRAM allocated by this process, in bytes\n\n**Permissions:** reading other processes' fdinfo requires `CAP_SYS_PTRACE` or root + `hostPID=true`. The deploying Ansible role grants both when `metrics_consumer_amdgpu_exporter_collect_processes: true`.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 44 },
       "options": { "showHeader": true },
@@ -267,6 +280,7 @@
       "id": 52,
       "type": "timeseries",
       "title": "Per-process engine busy (rate)",
+      "description": "Per-process per-engine GPU busy rate, computed as `rate(amdgpu_process_engine_busy_seconds_total[1m])`. The underlying counter increments every nanosecond a given engine is actively running work submitted by that process; `rate()` over a window divides by elapsed time, so the value is the **fraction of wall-clock time** the engine spent running this process's work.\n\n`1.0` = the process kept the engine fully busy for the entire window.\n`0.5` = the engine was running this process's work half the time.\n\n**Engines (`engine` label)**\n- `gfx` — graphics shader engine. Most ROCm/HIP/OpenCL/Vulkan compute lands here\n- `compute` — async compute queues (separate from `gfx` on architectures that expose them)\n- `enc` — video encoder (VCN encode pipeline)\n- `dec` — video decoder (VCN decode pipeline)\n- `jpeg` — JPEG codec engine on supported SKUs\n\n**Empty when no GPU workload is running** — same caveat as the VRAM panel. Source data is `drm-engine-*` lines from `/proc/<pid>/fdinfo`.",
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 44 },
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 } },
