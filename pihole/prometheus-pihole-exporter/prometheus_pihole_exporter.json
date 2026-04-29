@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {"type": "grafana", "uid": "-- Grafana --"},
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -35,310 +38,1225 @@
       "title": "Status",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "panels": []
     },
     {
       "id": 2,
       "title": "Up",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 3, "x": 0, "y": 1},
-      "targets": [{"expr": "pihole_up{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_up{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
       "fieldConfig": {
         "defaults": {
           "mappings": [
-            {"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
           ],
-          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
         }
       },
-      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_up`** \u2014 1 if the exporter successfully authenticated to the Pi-hole API on this scrape, 0 otherwise. Source: a `POST /api/auth` ping the exporter runs before any per-collector calls, so this gauge isolates auth health from individual collector failures. If this stat is red, check the exporter pod / service logs for `auth: rejected` (vault password mismatch) or connection timeouts (network / firewall). All other panels go blank when this is 0."
     },
     {
       "id": 3,
       "title": "Queries today",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 4, "x": 3, "y": 1},
-      "targets": [{"expr": "pihole_dns_queries_total{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "blue"}]}}},
-      "options": {"colorMode": "value", "graphMode": "area", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 3,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_dns_queries_total{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_dns_queries_total`** \u2014 total DNS queries Pi-hole has handled today. Pi-hole resets this counter at midnight server-time; PromQL `rate()` / `increase()` handle that as a normal counter restart. Source: `/api/stats/summary`. Use the time-range picker to widen if you're investigating a longer window than today."
     },
     {
       "id": 4,
       "title": "Blocked today",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 4, "x": 7, "y": 1},
-      "targets": [{"expr": "pihole_dns_queries_blocked_total{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}]}}},
-      "options": {"colorMode": "value", "graphMode": "area", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 7,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_dns_queries_blocked_total{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_dns_queries_blocked_total`** \u2014 queries Pi-hole answered with a block (gravity domain hit, regex match, exact denylist, etc.) today. Resets at midnight. Source: `/api/stats/summary`. Best read alongside the block-ratio gauge to the right \u2014 raw block counts are highly correlated with total query volume."
     },
     {
       "id": 5,
       "title": "Block ratio",
       "type": "gauge",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 4, "x": 11, "y": 1},
-      "targets": [{"expr": "pihole_dns_queries_blocked_ratio{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1, "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}, {"color": "green", "value": 0.05}, {"color": "yellow", "value": 0.3}, {"color": "red", "value": 0.6}]}}},
-      "options": {"showThresholdLabels": false, "showThresholdMarkers": true}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 11,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_dns_queries_blocked_ratio{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.05
+              },
+              {
+                "color": "yellow",
+                "value": 0.3
+              },
+              {
+                "color": "red",
+                "value": 0.6
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "description": "**`pihole_dns_queries_blocked_ratio`** \u2014 fraction of today's queries that were blocked, in [0, 1]. Source: `/api/stats/summary` (Pi-hole reports this directly as `percent_blocked` and the exporter divides by 100). On a typical home network 5\u201315% is normal; sustained values above 30% usually indicate a client doing something noisy (telemetry, ads-heavy app) rather than a Pi-hole problem."
     },
     {
       "id": 6,
       "title": "Active clients",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 3, "x": 15, "y": 1},
-      "targets": [{"expr": "pihole_dns_clients_active{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}},
-      "options": {"colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_dns_clients_active{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_dns_clients_active`** \u2014 distinct clients seen by Pi-hole in its rolling active window (typically the last 24h). Source: `/api/stats/summary` \u2192 `clients.active`. A drop to 0 with `pihole_up=1` usually means dnsmasq is up but no LAN client is currently configured to use it as their resolver."
     },
     {
       "id": 7,
       "title": "Gravity domains",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 3, "x": 18, "y": 1},
-      "targets": [{"expr": "pihole_gravity_domains{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}},
-      "options": {"colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_gravity_domains{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_gravity_domains`** \u2014 number of domains in the gravity (blocklist) database. Source: `/api/stats/summary` \u2192 `gravity.domains_being_blocked`. Updates after `pihole -g` runs (gravity refresh, scheduled or manual). A sudden drop to 0 means a gravity refresh failed or the database is uninitialised \u2014 check the gravity-last-update timestamp."
     },
     {
       "id": 8,
       "title": "Blocking",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 4, "w": 3, "x": 21, "y": 1},
-      "targets": [{"expr": "pihole_blocking_enabled{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "pihole_blocking_enabled{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
       "fieldConfig": {
         "defaults": {
-          "mappings": [{"type": "value", "options": {"0": {"text": "OFF", "color": "red"}, "1": {"text": "ON", "color": "green"}}}],
-          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "OFF",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "ON",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
         }
       },
-      "options": {"colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**`pihole_blocking_enabled`** \u2014 1 when Pi-hole's blocking is in the `enabled` state, 0 if it's `disabled` / `failed` / `unknown`. Source: `/api/dns/blocking`. Pi-hole's UI has a temporary-disable feature (\"disable for 5 minutes\") which flips this to 0 \u2014 useful for an alert with a for-duration to fire only on prolonged disablement."
     },
     {
       "id": 10,
       "title": "DNS",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "panels": []
     },
     {
       "id": 11,
       "title": "Query rate",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
       "targets": [
-        {"expr": "rate(pihole_dns_queries_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{instance}} total"},
-        {"expr": "rate(pihole_dns_queries_blocked_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "B", "legendFormat": "{{instance}} blocked"},
-        {"expr": "rate(pihole_dns_queries_forwarded_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "C", "legendFormat": "{{instance}} forwarded"},
-        {"expr": "rate(pihole_dns_queries_cached_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "D", "legendFormat": "{{instance}} cached"}
+        {
+          "expr": "rate(pihole_dns_queries_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "A",
+          "legendFormat": "{{instance}} total"
+        },
+        {
+          "expr": "rate(pihole_dns_queries_blocked_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "B",
+          "legendFormat": "{{instance}} blocked"
+        },
+        {
+          "expr": "rate(pihole_dns_queries_forwarded_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "C",
+          "legendFormat": "{{instance}} forwarded"
+        },
+        {
+          "expr": "rate(pihole_dns_queries_cached_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "D",
+          "legendFormat": "{{instance}} cached"
+        }
       ],
-      "fieldConfig": {"defaults": {"unit": "qps", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "stacking": {"mode": "none"}}}},
-      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"]}, "tooltip": {"mode": "multi"}}
+      "fieldConfig": {
+        "defaults": {
+          "unit": "qps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Query rate over time, broken down by handling.** Source: `rate()` of the four counters in `/api/stats/summary` \u2014 `pihole_dns_queries_{total, blocked, forwarded, cached}_total`. `total = blocked + forwarded + cached` (plus a small slice of locally-answered queries for known LAN names). Use the legend to spot which class is driving a spike: cached spikes = clients re-asking, forwarded spikes = upstream traffic, blocked spikes = ad-heavy client behavior."
     },
     {
       "id": 12,
       "title": "Queries by type",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
-      "targets": [{"expr": "rate(pihole_dns_queries_by_type_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{type}}"}],
-      "fieldConfig": {"defaults": {"unit": "qps", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 30, "stacking": {"mode": "normal"}}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(pihole_dns_queries_by_type_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "A",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "qps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 30,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Query rate partitioned by DNS record type** (A, AAAA, HTTPS, MX, etc.). Source: `pihole_dns_queries_by_type_total{type=\u2026}`. Mostly an interest-only panel for diagnosing client behavior \u2014 e.g. a sudden flood of `ANY` queries can indicate a misconfigured client or amplification probe. Stacked rendering shows how the mix shifts over time."
     },
     {
       "id": 13,
       "title": "Queries by reply",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
-      "targets": [{"expr": "rate(pihole_dns_queries_by_reply_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{reply}}"}],
-      "fieldConfig": {"defaults": {"unit": "qps", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 30, "stacking": {"mode": "normal"}}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "targets": [
+        {
+          "expr": "rate(pihole_dns_queries_by_reply_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "A",
+          "legendFormat": "{{reply}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "qps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 30,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Query rate partitioned by reply category** (`IP`, `CNAME`, `NXDOMAIN`, `NODATA`, `BLOB`, etc.). Source: `pihole_dns_queries_by_reply_total{reply=\u2026}`. An elevated `NXDOMAIN` rate often means a client is doing reverse-DNS lookups for unknown LAN IPs; `NODATA` spikes can indicate IPv6 lookups without IPv6 connectivity."
     },
     {
       "id": 14,
       "title": "Queries by status",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
-      "targets": [{"expr": "rate(pihole_dns_queries_by_status_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{status}}"}],
-      "fieldConfig": {"defaults": {"unit": "qps", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 30, "stacking": {"mode": "normal"}}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "targets": [
+        {
+          "expr": "rate(pihole_dns_queries_by_status_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "A",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "qps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 30,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Query rate partitioned by Pi-hole's FTL status.** Source: `pihole_dns_queries_by_status_total{status=\u2026}`. The `status` label exposes FTL's internal answer-source enum: `CACHE` / `FORWARDED` / `GRAVITY` / `DENYLIST*` / `EXTERNAL_BLOCKED_*` etc. Useful when the high-level blocked/forwarded/cached split in the Query Rate panel isn't enough to explain a regression \u2014 this drills into the specific block reason."
     },
     {
       "id": 20,
       "title": "Upstreams",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 22},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
       "panels": []
     },
     {
       "id": 21,
       "title": "Upstream query rate",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 23},
-      "targets": [{"expr": "rate(pihole_dns_upstream_queries_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{upstream}}"}],
-      "fieldConfig": {"defaults": {"unit": "qps", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "targets": [
+        {
+          "expr": "rate(pihole_dns_upstream_queries_total{instance=~\"$instance\"}[$__rate_interval])",
+          "refId": "A",
+          "legendFormat": "{{upstream}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "qps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Per-upstream query rate.** Source: `pihole_dns_upstream_queries_total{upstream=\u2026}`. `cache` and `blocklist` are pseudo-upstreams Pi-hole reports for queries answered locally; the rest are real recursive resolvers (e.g. `dns9.quad9.net`, `1.1.1.1`). If one upstream's rate suddenly drops to 0 while others spike, that resolver may be unreachable or rate-limited."
     },
     {
       "id": 22,
       "title": "Upstream response time",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 23},
-      "targets": [{"expr": "pihole_dns_upstream_response_seconds{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{upstream}}"}],
-      "fieldConfig": {"defaults": {"unit": "s", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "targets": [
+        {
+          "expr": "pihole_dns_upstream_response_seconds{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{upstream}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**Per-upstream response time** (Pi-hole's reported mean RTT). Source: `pihole_dns_upstream_response_seconds{upstream=\u2026}`. Sustained values above 100 ms for an external resolver usually mean upstream congestion or a WAN link issue. The local pseudo-upstreams (cache, blocklist) should be near-zero."
     },
     {
       "id": 30,
       "title": "FTL runtime",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 31},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
       "panels": []
     },
     {
       "id": 31,
       "title": "FTL CPU %",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 32},
-      "targets": [{"expr": "pihole_ftl_cpu_percent{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "targets": [
+        {
+          "expr": "pihole_ftl_cpu_percent{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "description": "**FTL daemon CPU usage** (% of one core). Source: `pihole_ftl_cpu_percent`, originally `/api/info/ftl` \u2192 `%cpu`. Healthy baseline is well under 5%. Sustained high CPU often correlates with a client doing very high QPS or with ongoing gravity database operations."
     },
     {
       "id": 32,
       "title": "FTL memory %",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 32},
-      "targets": [{"expr": "pihole_ftl_memory_percent{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "targets": [
+        {
+          "expr": "pihole_ftl_memory_percent{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "description": "**FTL daemon memory usage** (% of system RAM). Source: `pihole_ftl_memory_percent`, originally `/api/info/ftl` \u2192 `%mem`. On the NanoPi M4 v2 (mc-01) anything below 10% is fine. A steady upward trend across days could be query-database growth \u2014 check the gravity / long-term query DB sizes if it climbs."
     },
     {
       "id": 33,
       "title": "Scrape duration",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 32},
-      "targets": [{"expr": "pihole_scrape_duration_seconds{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "s", "min": 0, "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "targets": [
+        {
+          "expr": "pihole_scrape_duration_seconds{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "description": "**Time the exporter spent gathering metrics for this Pi-hole instance per scrape.** Source: `pihole_scrape_duration_seconds`. Includes the auth ping + every enabled collector's API calls. Healthy values are typically <200ms; a creep above 1s usually means Pi-hole's API is slow (FTL under load) or a network-path latency change."
     },
     {
       "id": 40,
       "title": "DHCP",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
       "panels": []
     },
     {
       "id": 41,
       "title": "Active DHCP leases",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 40},
-      "targets": [{"expr": "sum by (family) (pihole_dhcp_leases_active{instance=~\"$instance\"})", "refId": "A", "legendFormat": "{{family}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}},
-      "options": {"colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 40
+      },
+      "targets": [
+        {
+          "expr": "sum by (family) (pihole_dhcp_leases_active{instance=~\"$instance\"})",
+          "refId": "A",
+          "legendFormat": "{{family}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**Currently-active DHCP leases**, partitioned by IP family (ipv4 / ipv6). Source: `pihole_dhcp_leases_active{family=\u2026}` from the leases-file collector \u2014 requires the exporter to have read access to `/etc/pihole/dhcp.leases` (deploy as systemd alongside Pi-hole, OR mount the file into the container). Counts leases whose `expiry > now()` at scrape time; expired-but-still-on-file leases land in the panel to the right."
     },
     {
       "id": 42,
       "title": "Expired (still on file)",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 40},
-      "targets": [{"expr": "sum by (family) (pihole_dhcp_leases_expired{instance=~\"$instance\"})", "refId": "A", "legendFormat": "{{family}}"}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}, {"color": "yellow", "value": 5}]}}},
-      "options": {"colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 40
+      },
+      "targets": [
+        {
+          "expr": "sum by (family) (pihole_dhcp_leases_expired{instance=~\"$instance\"})",
+          "refId": "A",
+          "legendFormat": "{{family}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**Leases on file but past their expiry timestamp.** Source: `pihole_dhcp_leases_expired{family=\u2026}`. dnsmasq keeps expired leases in the file briefly before pruning so reconnects can keep their old IP \u2014 a small steady-state count is normal. A growing count over time may indicate the dnsmasq prune cycle isn't running or the file isn't being cleaned up."
     },
     {
       "id": 43,
       "title": "DHCP message rate",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 40},
-      "targets": [{"expr": "rate(pihole_dhcp_messages_total{instance=~\"$instance\"}[$__rate_interval])", "refId": "A", "legendFormat": "{{type}}"}],
-      "fieldConfig": {"defaults": {"unit": "ops", "custom": {"drawStyle": "line", "lineWidth": 1, "fillOpacity": 10}}},
-      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]}, "tooltip": {"mode": "multi"}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "targets": [
+        {
+          "expr": "sum by (type) (rate(pihole_ftl_dhcp_messages_total{instance=~\"$instance\"}[$__rate_interval])) or sum by (type) (rate(pihole_dhcp_messages_total{instance=~\"$instance\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "description": "**DHCP message rate per type** (DHCPACK / NAK / OFFER / REQUEST / DECLINE / RELEASE / DISCOVER / INFORM). Two data sources, used in priority order:\n\n1. `pihole_ftl_dhcp_messages_total` \u2014 Pi-hole's FTL surfaces these counters in `/api/info/ftl` (cumulative since FTL start). Always available when the DNS collector is on, no filesystem access needed.\n2. `pihole_dhcp_messages_total` \u2014 the log-tailer collector's view, which tracks every DHCP line in `/var/log/pihole/pihole.log` since the exporter started.\n\nEither signal looks the same on this panel; the FTL path is preferred since it survives exporter restarts (FTL's counters reset only when pihole-FTL itself restarts). A persistent NAK rate usually means a client is requesting an IP outside the configured pool."
     },
     {
       "id": 44,
       "title": "Time since last DHCP event",
       "type": "stat",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 5, "w": 12, "x": 0, "y": 47},
-      "targets": [{"expr": "time() - pihole_dhcp_log_last_event_timestamp_seconds{instance=~\"$instance\"} > 0", "refId": "A", "legendFormat": "{{instance}}"}],
-      "fieldConfig": {"defaults": {"unit": "s", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 3600}, {"color": "red", "value": 86400}]}}},
-      "options": {"colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 47
+      },
+      "targets": [
+        {
+          "expr": "time() - pihole_dhcp_log_last_event_timestamp_seconds{instance=~\"$instance\"} > 0",
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3600
+              },
+              {
+                "color": "red",
+                "value": 86400
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "**Time elapsed since the most recent DHCP event.** Source: `time() - pihole_dhcp_log_last_event_timestamp_seconds` (filtered to exclude unset / zero values). Indicates DHCP activity freshness \u2014 most home networks see at least one DHCP message every few hours as devices renew. Threshold colors: green <1h, yellow 1h\u201324h, red >24h. Requires the log-tailer collector. With no log-tailer this panel is intentionally blank."
     },
     {
       "id": 45,
       "title": "DHCP leases by family",
       "type": "table",
-      "datasource": {"type": "prometheus", "uid": "${datasource}"},
-      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 47},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 47
+      },
       "targets": [
-        {"expr": "pihole_dhcp_leases_active{instance=~\"$instance\"}", "refId": "A", "legendFormat": "active", "format": "table", "instant": true},
-        {"expr": "pihole_dhcp_leases_expired{instance=~\"$instance\"}", "refId": "B", "legendFormat": "expired", "format": "table", "instant": true},
-        {"expr": "pihole_dhcp_leases_total{instance=~\"$instance\"}", "refId": "C", "legendFormat": "total", "format": "table", "instant": true}
+        {
+          "expr": "pihole_dhcp_leases_active{instance=~\"$instance\"}",
+          "refId": "A",
+          "legendFormat": "active",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "expr": "pihole_dhcp_leases_expired{instance=~\"$instance\"}",
+          "refId": "B",
+          "legendFormat": "expired",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "expr": "pihole_dhcp_leases_total{instance=~\"$instance\"}",
+          "refId": "C",
+          "legendFormat": "total",
+          "format": "table",
+          "instant": true
+        }
       ],
       "transformations": [
-        {"id": "merge"},
-        {"id": "organize", "options": {"excludeByName": {"Time": true, "__name__": true, "job": true, "service": true, "namespace": true}, "renameByName": {"Value #A": "active", "Value #B": "expired", "Value #C": "total"}}}
-      ]
+        {
+          "id": "merge"
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "service": true,
+              "namespace": true
+            },
+            "renameByName": {
+              "Value #A": "active",
+              "Value #B": "expired",
+              "Value #C": "total"
+            }
+          }
+        }
+      ],
+      "description": "**Lease totals partitioned by IP family** \u2014 the same family-axis numbers from the two stats above (active + expired + total) reformatted as a table for at-a-glance \"how many leases right now\". Source: same `pihole_dhcp_leases_{active,expired,total}{family=\u2026}` series. Requires the leases-file collector."
     },
     {
       "id": 50,
       "title": "Health",
       "type": "row",
       "collapsed": true,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 54},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 54
+      },
       "panels": [
         {
           "id": 51,
           "title": "Per-collector health",
           "type": "stat",
-          "datasource": {"type": "prometheus", "uid": "${datasource}"},
-          "gridPos": {"h": 5, "w": 24, "x": 0, "y": 55},
-          "targets": [{"expr": "pihole_collector_up{instance=~\"$instance\"}", "refId": "A", "legendFormat": "{{instance}} / {{collector}}"}],
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 55
+          },
+          "targets": [
+            {
+              "expr": "pihole_collector_up{instance=~\"$instance\"}",
+              "refId": "A",
+              "legendFormat": "{{instance}} / {{collector}}"
+            }
+          ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}],
-              "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "DOWN",
+                      "color": "red"
+                    },
+                    "1": {
+                      "text": "UP",
+                      "color": "green"
+                    }
+                  }
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
+              }
             }
           },
-          "options": {"colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}}
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "description": "**Per-collector health on this scrape.** Source: `pihole_collector_up{collector=\u2026}`. One row per collector group the exporter knows about (`dns`, `dhcp_leases`, `dhcp_log`). 1 only when every endpoint that collector consumed succeeded this scrape; 0 if any single one returned a non-200 or failed to decode. Useful for telling \"the exporter's up but my dnsmasq counters are flat\" apart from \"the exporter just died\"."
         },
         {
           "id": 52,
           "title": "Pi-hole component versions",
           "type": "table",
-          "datasource": {"type": "prometheus", "uid": "${datasource}"},
-          "gridPos": {"h": 5, "w": 24, "x": 0, "y": 60},
-          "targets": [{"expr": "pihole_info{instance=~\"$instance\"}", "refId": "A", "format": "table", "instant": true}],
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 60
+          },
+          "targets": [
+            {
+              "expr": "pihole_info{instance=~\"$instance\"}",
+              "refId": "A",
+              "format": "table",
+              "instant": true
+            }
+          ],
           "transformations": [
-            {"id": "organize", "options": {"excludeByName": {"Time": true, "__name__": true, "job": true, "Value": true}}}
-          ]
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "__name__": true,
+                  "job": true,
+                  "Value": true
+                }
+              }
+            }
+          ],
+          "description": "**Pi-hole component versions** as labels on a constant-1 info gauge. Source: `pihole_info{core_version, ftl_version, web_version}` from `/api/info/version`. Use to cross-check whether a metrics-shape change lines up with a Pi-hole upgrade."
         }
       ]
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["pihole", "dns", "dhcp"],
+  "tags": [
+    "pihole",
+    "dns",
+    "dhcp"
+  ],
   "templating": {
     "list": [
       {
@@ -347,28 +1265,46 @@
         "type": "datasource",
         "query": "prometheus",
         "refresh": 1,
-        "current": {"selected": false, "text": "Prometheus", "value": "Prometheus"}
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        }
       },
       {
         "name": "instance",
         "label": "Pi-hole instance",
         "type": "query",
-        "datasource": {"type": "prometheus", "uid": "${datasource}"},
-        "query": {"qryType": 1, "query": "label_values(pihole_up, instance)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "query": {
+          "qryType": 1,
+          "query": "label_values(pihole_up, instance)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
         "regex": "",
         "refresh": 1,
         "multi": true,
         "includeAll": true,
         "allValue": ".*",
-        "current": {"selected": false, "text": "All", "value": "$__all"}
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
-  "time": {"from": "now-6h", "to": "now"},
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
-  "title": "Pi-hole — DNS + DHCP",
+  "title": "Pi-hole \u2014 DNS + DHCP",
   "uid": "prometheus-pihole-exporter",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
