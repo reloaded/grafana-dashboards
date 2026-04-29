@@ -821,7 +821,7 @@
           }
         }
       },
-      "description": "**FTL daemon memory usage** (% of system RAM). Source: `pihole_ftl_memory_percent`, originally `/api/info/ftl` \u2192 `%mem`. On the NanoPi M4 v2 (mc-01) anything below 10% is fine. A steady upward trend across days could be query-database growth \u2014 check the gravity / long-term query DB sizes if it climbs."
+      "description": "**FTL daemon memory usage** (% of system RAM). Source: `pihole_ftl_memory_percent`, originally `/api/info/ftl` \u2192 `%mem`. Healthy baseline depends on the host's total RAM \u2014 on a small SBC (\u22642 GB) anything below 10% is fine; on a larger host the absolute memory footprint is what to watch instead. A steady upward trend across days usually points at query-database growth: check the gravity DB and the long-term query DB sizes if it climbs."
     },
     {
       "id": 33,
@@ -1305,6 +1305,6 @@
   "timezone": "",
   "title": "Pi-hole \u2014 DNS + DHCP",
   "uid": "prometheus-pihole-exporter",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
