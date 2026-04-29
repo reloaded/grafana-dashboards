@@ -129,7 +129,7 @@
       },
       "targets": [
         {
-          "expr": "pihole_dns_queries_total{instance=~\"$instance\"}",
+          "expr": "increase(pihole_dns_queries_total{instance=~\"$instance\"}[24h])",
           "refId": "A",
           "legendFormat": "{{instance}}"
         }
@@ -162,7 +162,7 @@
           "values": false
         }
       },
-      "description": "**`pihole_dns_queries_total`** \u2014 total DNS queries Pi-hole has handled today. Pi-hole resets this counter at midnight server-time; PromQL `rate()` / `increase()` handle that as a normal counter restart. Source: `/api/stats/summary`. Use the time-range picker to widen if you're investigating a longer window than today."
+      "description": "**`increase(pihole_dns_queries_total[24h])`** \u2014 total DNS queries Pi-hole has handled in the past 24 hours. Source: `/api/stats/summary`. The exporter wraps Pi-hole's 24-hour rolling total with a windowed\u2192monotonic accumulator so the underlying `pihole_dns_queries_total` is a true Prometheus counter (process-lifetime since exporter start); use `increase(...[24h])` here to get the rolling-24h figure this panel labels as \"today\". Useful as an at-a-glance traffic baseline; pair with the `Query rate` panel for sub-day visibility. Reads 0 until the exporter has been up for 24 hours."
     },
     {
       "id": 4,
@@ -180,7 +180,7 @@
       },
       "targets": [
         {
-          "expr": "pihole_dns_queries_blocked_total{instance=~\"$instance\"}",
+          "expr": "increase(pihole_dns_queries_blocked_total{instance=~\"$instance\"}[24h])",
           "refId": "A",
           "legendFormat": "{{instance}}"
         }
@@ -213,7 +213,7 @@
           "values": false
         }
       },
-      "description": "**`pihole_dns_queries_blocked_total`** \u2014 queries Pi-hole answered with a block (gravity domain hit, regex match, exact denylist, etc.) today. Resets at midnight. Source: `/api/stats/summary`. Best read alongside the block-ratio gauge to the right \u2014 raw block counts are highly correlated with total query volume."
+      "description": "**`increase(pihole_dns_queries_blocked_total[24h])`** \u2014 queries Pi-hole answered with a block (gravity domain hit, regex match, exact denylist, etc.) over the past 24 hours. Source: `/api/stats/summary`. The exporter wraps Pi-hole's 24-hour rolling total with a windowed\u2192monotonic accumulator so the underlying counter is true monotonic; this panel uses `increase(...[24h])` to recover the rolling-24h \"today\" semantics. Pair with the `Block ratio` stat for percent-of-traffic context. Reads 0 until the exporter has been up for 24 hours."
     },
     {
       "id": 5,
