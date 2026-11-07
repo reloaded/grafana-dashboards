@@ -1,6 +1,6 @@
 # github.com/ROCm/device-metrics-exporter Grafana Dashboards
 
-These dashboards are customized versions of the ones provided by [rocm/device-metrics-exporter](https://github.com/ROCm/device-metrics-exporter) for my own home lab running consumer grade AMD GPUs like the RX 7900 XTX 24GB.
+These dashboards are customized versions of the ones provided by [rocm/device-metrics-exporter](https://github.com/ROCm/device-metrics-exporter) for a self-hosted intranet running consumer grade AMD GPUs like the RX 7900 XTX 24GB.
 
 Since I'm running on consumer grade GPUs and not datacenter GPUs not every metric provided by rocm/device-metrics-exporter are available, but a handful are available for consumption. Because of the consumer vs datacenter GPU differences I had to customize this dashboard with the below changes.
 
